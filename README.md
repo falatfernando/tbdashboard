@@ -194,9 +194,6 @@ python app.py
 ```
 
 ## Future Enhancements
-
-- [ ] Add support for custom VCF file upload
-- [ ] Implement mutation frequency visualization
 - [ ] Export results to PDF/Excel
 - [ ] Batch search for multiple genes/mutations
 
