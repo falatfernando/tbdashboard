@@ -121,8 +121,6 @@ tbdashboard/
 - **GFF3 Annotation**: RefSeq annotations via NCBI
 - **Drug Resistance Catalogue**: [WHO Catalogue (2023) second edition](https://www.who.int/publications/i/item/9789240082410) for *M. tuberculosis* drug resistance.
 
-## API Reference
-
 ### DataLoader Class
 
 ```python
@@ -199,14 +197,12 @@ python app.py
 
 - [ ] Add support for custom VCF file upload
 - [ ] Implement mutation frequency visualization
-- [ ] Add phylogenetic tree view
 - [ ] Export results to PDF/Excel
-- [ ] Advanced filtering by drug, tier, confidence
 - [ ] Batch search for multiple genes/mutations
 
 ## License
 
-This project is for research and educational purposes.
+This project is open source under GNU General Public License (GPL).
 
 ## Contributing
 
