@@ -12,8 +12,11 @@ import os
 from data_utils import DataLoader
 from coordinate_calculator import CoordinateCalculator
 
+# Get absolute path for data directory
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+
 # Initialize data loader
-data_loader = DataLoader(data_dir="data")
+data_loader = DataLoader(data_dir=DATA_DIR)
 data_loader.load_gff3()
 data_loader.load_catalogue()
 data_loader.load_genomic_coordinates()
@@ -30,10 +33,13 @@ app = dash.Dash(
 )
 app.title = "TB Dashboard - Genomic Resistance Explorer"
 
+# Expose the Flask server for gunicorn
+server = app.server
+
 # Flask route to serve data files for JBrowse
-@app.server.route('/data/<path:path>')
+@server.route('/data/<path:path>')
 def serve_data(path):
-    return send_from_directory('data', path)
+    return send_from_directory(DATA_DIR, path)
 
 # App layout
 app.layout = dbc.Container([
