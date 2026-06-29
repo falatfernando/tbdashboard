@@ -47,6 +47,14 @@ Ensure the following files exist in the `data/` directory:
 - `catalogue_master_file.txt` - WHO drug resistance catalogue
 - `genomic_coordinates.txt` - Mutation coordinates
 
+## Running Tests
+
+To run the automated tests, ensure you have installed the dependencies (including `pytest`), and execute the following command from the root directory:
+
+```bash
+pytest tests/
+```
+
 ## Usage
 
 ### Running the Application
@@ -200,7 +208,7 @@ python app.py
 
 ## License
 
-This project is open source under GNU General Public License (GPL).
+This project is licensed under the GNU General Public License v3.0.
 
 ## Contributing
 
