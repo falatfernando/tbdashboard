@@ -1,5 +1,6 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
 \usepackage{amsmath}
 \usepackage{hyperref}
 \usepackage{booktabs}
@@ -25,25 +26,25 @@
 \section{Background}
 Tuberculosis (TB), caused by the bacterium \textit{Mycobacterium tuberculosis}, remains a leading infectious cause of mortality globally. The management of TB is severely challenged by the ongoing emergence and spread of multi-drug resistant (MDR) and extensively drug-resistant (XDR) strains. While next-generation sequencing (NGS) technologies have made genomic profiling increasingly accessible, interpreting the clinical significance of identified mutations remains a bottleneck.
 
-To standardize the interpretation of genetic variants, the World Health Organization (WHO) released a comprehensive catalogue of mutations in the \textit{Mycobacterium tuberculosis} complex associated with drug resistance. This database provides statistical gradings (e.g., ``Associated with resistance'', ``Not associated'') for thousands of variants across multiple anti-TB drugs. However, the catalogue is distributed as massive, flat text files (often exceeding 35 MB) containing thousands of rows. For public health workers, laboratory technicians, and clinicians without bioinformatic training, querying, filtering, and drawing insights from these static data files is highly challenging.
+To standardize the interpretation of genetic variants, the World Health Organization (WHO) released a comprehensive catalogue of mutations in the \textit{Mycobacterium tuberculosis} complex associated with drug resistance~\cite{whocatalogue}. This database provides statistical gradings (e.g., ``Associated with resistance'', ``Not associated'') for thousands of variants across multiple anti-TB drugs. However, the catalogue is distributed as massive, flat text files (often exceeding 35 MB) containing thousands of rows. For public health workers, laboratory technicians, and clinicians without bioinformatic training, querying, filtering, and drawing insights from these static data files is highly challenging.
 
-Existing genomic interpretation tools often require command-line interfaces or necessitate the upload of raw sequencing data (FASTQ/BAM format) to remote servers. This introduces significant concerns regarding patient data privacy, high computational overhead, and network bandwidth limitations in low- and middle-income countries where the TB burden is highest. There is a clear need for a lightweight, interactive, gene-centric graphical interface that can run locally, allowing clinicians and researchers to visualize genetic features and consult the WHO catalogue instantaneously based on gene or variant queries.
+Existing genomic interpretation tools often require command-line interfaces or necessitate the upload of raw sequencing data (FASTQ/BAM format) to remote servers. This introduces significant concerns regarding patient data privacy, high computational overhead, and network bandwidth limitations in low- and middle-income countries where the TB burden is highest. There is a clear need for a lightweight, interactive, gene-centric graphical interface that can run locally, allowing clinicians and researchers to visualize genetic features and consult the WHO catalogue database~\cite{whocatalogue} instantaneously based on gene or variant queries.
 
 \section{Implementation}
-TBDashboard is implemented using the Python programming language and leveraging the Dash web application framework (v2.14.0+), which combines Flask, React, and Plotly under the hood. Visual layouts and interactive components are styled using Dash Bootstrap Components (\texttt{dash-bootstrap-components} v1.5.0+), ensuring a responsive, modern interface.
+TBDashboard is implemented using the Python programming language and leveraging the Dash web application framework~\cite{plotlydash} (v2.14.0+), which combines Flask, React, and Plotly. Visual layouts and interactive components are styled using Dash Bootstrap Components (\texttt{dash-bootstrap-components} v1.5.0+), ensuring a responsive, modern interface.
 
 \subsection{Database and Data Loading Mechanism}
-The application uses local, file-based storage to minimize setup complexity and external network dependencies. It processes three primary inputs:
+The application uses local, file-based storage to minimize setup complexity and external network dependencies. According to the repository structure, it processes three primary inputs situated in the \texttt{data/} directory:
 \begin{enumerate}
-    \item A reference genome annotation file (GFF3 format) for the \textit{M. tuberculosis} H37Rv reference strain (NC\_000962.3).
-    \item The WHO drug resistance mutation catalogue tab-separated file.
-    \item A mapping file containing absolute genomic coordinates for catalogued variants.
+    \item A reference genome annotation file (\texttt{h37rv.gff3}) for the \textit{M. tuberculosis} H37Rv reference strain (\texttt{NC\_000962.3})~\cite{refseq}.
+    \item The WHO drug resistance mutation catalogue tab-separated file (\texttt{catalogue\_master\_file.txt}).
+    \item A mapping file containing absolute genomic coordinates for catalogued variants (\texttt{genomic\_coordinates.txt}).
 \end{enumerate}
 
-To ensure rapid queries of gene models and features, the GFF3 annotation file is parsed using the \texttt{gffutils} library to construct a localized, thread-safe SQLite database. Large dataset queries for the mutation catalogue are managed using the \texttt{pandas} library, which loads datasets into memory for fast, server-side filtering. 
+To ensure rapid queries of gene models and features, the GFF3 annotation file is parsed using the \texttt{gffutils} library~\cite{gffutils} to construct a localized, thread-safe SQLite database (\texttt{h37rv.gff3.db}). Large dataset queries for the mutation catalogue and coordinates are managed using the \texttt{pandas} library, which loads datasets into memory for fast, server-side filtering. 
 
 \subsection{Genome Browser Integration}
-Visual inspection of local genomic contexts is facilitated by an embedded JBrowse 2 browser component integrated via \texttt{dash-jbrowse}. The browser is configured with reference FASTA files (\texttt{h37rv.fasta}) and indexes. When a user searches for a specific gene, the application calculates the coordinates (including a 100-bp padding window) and instructs the client-side JBrowse component to center on the target genomic locus.
+Visual inspection of local genomic contexts is facilitated by an embedded genome browser component integrated via \texttt{dash-jbrowse}~\cite{jbrowse2}. The browser is configured with reference FASTA files (\texttt{h37rv.fasta}) and indexes (\texttt{h37rv.fasta.fai}). When a user searches for a specific gene, the application calculates the coordinates and instructs the client-side JBrowse component to center on the target genomic locus.
 
 \subsection{Coordinate Translation Engine}
 The core coordinate calculator maps positions between different coordinate systems:
@@ -71,7 +72,7 @@ The workflow is designed around a single search bar where the user inputs a gene
     \item \textbf{Gene Information Summary:} A card displays the selected gene's absolute coordinates, strand orientation, gene length, and description.
     \item \textbf{Genomic Browser View:} The embedded JBrowse track visually shifts to the gene's region, enabling users to inspect surrounding genomic features.
     \item \textbf{Drug Resistance Profile Table:} The app extracts all variants associated with that gene from the WHO catalogue, listing the mutation, associated drug, clinical tier, predicted effect, and the final WHO confidence grading.
-    \item \textbf{Coordinate Conversion Tool:} Users can input specific variants (e.g., \texttt{dnaA\_c.7G>A}) to calculate their absolute genomic coordinates, or input genomic positions to find the corresponding relative c. or p. notations.
+    \item \textbf{Coordinate Conversion Tool:} Users can input specific variants (e.g., \texttt{dnaA\_c.7G\textgreater{}A}) to calculate their absolute genomic coordinates, or input genomic positions to find the corresponding relative c. or p. notations.
 \end{enumerate}
 
 \subsection{Accessibility and Utility}
@@ -85,5 +86,39 @@ By running entirely on local datasets, TBDashboard guarantees patient data priva
     \item \textbf{Programming language:} Python (version 3.8 or higher)
     \item \textbf{License:} GNU General Public License v3.0
 \end{itemize}
+
+\begin{thebibliography}{10}
+
+\bibitem{jbrowse2}
+Diesh, C., et al. (2023).
+\newblock JBrowse 2: a modular genome browser with views of synteny and structural variation.
+\newblock \emph{Genome Biology}, 24(1), 74.
+\newblock \url{https://doi.org/10.1186/s13059-023-02914-z}
+
+\bibitem{whocatalogue}
+World Health Organization. (2023).
+\newblock \emph{WHO catalogue of mutations in Mycobacterium tuberculosis complex and their association with drug resistance: second edition}.
+\newblock Geneva: World Health Organization.
+\newblock \url{https://www.who.int/publications/i/item/9789240082410}
+
+\bibitem{plotlydash}
+Plotly Technologies Inc. (2015).
+\newblock \emph{Collaborative, interactive light-weight web-based dashboarding with Dash}.
+\newblock Montreal, QC: Plotly.
+\newblock \url{https://plot.ly}
+
+\bibitem{gffutils}
+Dale, R.~K. (2014).
+\newblock \emph{gffutils: A Python package for working with GFF and GTF files}.
+\newblock GitHub.
+\newblock \url{https://github.com/daler/gffutils}
+
+\bibitem{refseq}
+O'Leary, N.~A., et al. (2016).
+\newblock Reference sequence (RefSeq) database at NCBI: current status, taxonomic expansion, and functional annotation.
+\newblock \emph{Nucleic Acids Research}, 44(D1), D733--D745.
+\newblock \url{https://doi.org/10.1093/nar/gkv1189}
+
+\end{thebibliography}
 
 \end{document}
