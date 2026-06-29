@@ -1,0 +1,89 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+
+\title{TBDashboard: An interactive web-based interface for visual exploration of the WHO Mycobacterium tuberculosis drug resistance catalogue}
+\author{Fernando Falat Rangel \\
+\small\href{mailto:fernandofalat@proton.me}{fernandofalat@proton.me}}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\textbf{Background:} The rise of multi-drug resistant tuberculosis (MDR-TB) necessitates rapid and accurate genomic interpretation. The World Health Organization (WHO) compiled a comprehensive catalogue of resistance-associated mutations in \textit{Mycobacterium tuberculosis}, but the raw, text-based tables present a high barrier of entry for clinical and public health workers lacking bioinformatics expertise. \\
+\textbf{Objective:} We developed TBDashboard, an interactive, web-based graphical user interface designed to bridge this gap by enabling gene-centric visual exploration of the WHO drug resistance mutation catalogue without requiring programming or raw sequence analysis. \\
+\textbf{Software Features:} TBDashboard is built using Python Dash and integrates the JBrowse 2 genome browser via \texttt{dash-jbrowse}. The application offers: (1) quick lookup of tuberculosis genes by name or locus tag; (2) interactive, localized genomic track visualization; (3) WHO catalogue drug resistance profiling detailing confidence levels and effect sizes; (4) a coordinate calculator for translating between gene-relative (c. or p.) and absolute genomic positions; and (5) mutation-specific genomic coordinate details. \\
+\textbf{Significance:} By providing a localized, interactive, and dependency-light interface, TBDashboard facilitates the translation of complex genomic annotations into clinical understanding. It represents an essential open-source resource for public health epidemiology, diagnostic research, and clinical laboratories, especially in low-resource settings where bioinformatic pipelines are unavailable.
+\end{abstract}
+
+\section{Background}
+Tuberculosis (TB), caused by the bacterium \textit{Mycobacterium tuberculosis}, remains a leading infectious cause of mortality globally. The management of TB is severely challenged by the ongoing emergence and spread of multi-drug resistant (MDR) and extensively drug-resistant (XDR) strains. While next-generation sequencing (NGS) technologies have made genomic profiling increasingly accessible, interpreting the clinical significance of identified mutations remains a bottleneck.
+
+To standardize the interpretation of genetic variants, the World Health Organization (WHO) released a comprehensive catalogue of mutations in the \textit{Mycobacterium tuberculosis} complex associated with drug resistance. This database provides statistical gradings (e.g., ``Associated with resistance'', ``Not associated'') for thousands of variants across multiple anti-TB drugs. However, the catalogue is distributed as massive, flat text files (often exceeding 35 MB) containing thousands of rows. For public health workers, laboratory technicians, and clinicians without bioinformatic training, querying, filtering, and drawing insights from these static data files is highly challenging.
+
+Existing genomic interpretation tools often require command-line interfaces or necessitate the upload of raw sequencing data (FASTQ/BAM format) to remote servers. This introduces significant concerns regarding patient data privacy, high computational overhead, and network bandwidth limitations in low- and middle-income countries where the TB burden is highest. There is a clear need for a lightweight, interactive, gene-centric graphical interface that can run locally, allowing clinicians and researchers to visualize genetic features and consult the WHO catalogue instantaneously based on gene or variant queries.
+
+\section{Implementation}
+TBDashboard is implemented using the Python programming language and leveraging the Dash web application framework (v2.14.0+), which combines Flask, React, and Plotly under the hood. Visual layouts and interactive components are styled using Dash Bootstrap Components (\texttt{dash-bootstrap-components} v1.5.0+), ensuring a responsive, modern interface.
+
+\subsection{Database and Data Loading Mechanism}
+The application uses local, file-based storage to minimize setup complexity and external network dependencies. It processes three primary inputs:
+\begin{enumerate}
+    \item A reference genome annotation file (GFF3 format) for the \textit{M. tuberculosis} H37Rv reference strain (NC\_000962.3).
+    \item The WHO drug resistance mutation catalogue tab-separated file.
+    \item A mapping file containing absolute genomic coordinates for catalogued variants.
+\end{enumerate}
+
+To ensure rapid queries of gene models and features, the GFF3 annotation file is parsed using the \texttt{gffutils} library to construct a localized, thread-safe SQLite database. Large dataset queries for the mutation catalogue are managed using the \texttt{pandas} library, which loads datasets into memory for fast, server-side filtering. 
+
+\subsection{Genome Browser Integration}
+Visual inspection of local genomic contexts is facilitated by an embedded JBrowse 2 browser component integrated via \texttt{dash-jbrowse}. The browser is configured with reference FASTA files (\texttt{h37rv.fasta}) and indexes. When a user searches for a specific gene, the application calculates the coordinates (including a 100-bp padding window) and instructs the client-side JBrowse component to center on the target genomic locus.
+
+\subsection{Coordinate Translation Engine}
+The core coordinate calculator maps positions between different coordinate systems:
+\begin{itemize}
+    \item \textbf{Genomic Position:} Absolute position on the chromosome (1-based index).
+    \item \textbf{Gene Relative Position:} Nucleotide position relative to the transcription start site (coding DNA c. notation).
+    \item \textbf{Amino Acid Position:} Codon position relative to the translation start (p. notation).
+\end{itemize}
+
+The calculator handles strand orientation, which is crucial for correct mapping in the MTBC genome. For genes located on the positive (+) strand, the genomic position is calculated as:
+\begin{equation}
+    \text{Genomic Position} = \text{Gene Start} + \text{Relative Position} - 1
+\end{equation}
+Conversely, for genes on the negative (-) strand, the coordinates are mapped using:
+\begin{equation}
+    \text{Genomic Position} = \text{Gene End} - \text{Relative Position} + 1
+\end{equation}
+
+\section{Results and Discussion}
+TBDashboard provides a unified, user-friendly workspace that eliminates the need for manual text filtering or command-line scripting. 
+
+\subsection{User Workflow}
+The workflow is designed around a single search bar where the user inputs a gene name (e.g., \textit{katG}, \textit{rpoB}) or locus tag (e.g., \textit{Rv1908c}). Upon submission:
+\begin{enumerate}
+    \item \textbf{Gene Information Summary:} A card displays the selected gene's absolute coordinates, strand orientation, gene length, and description.
+    \item \textbf{Genomic Browser View:} The embedded JBrowse track visually shifts to the gene's region, enabling users to inspect surrounding genomic features.
+    \item \textbf{Drug Resistance Profile Table:} The app extracts all variants associated with that gene from the WHO catalogue, listing the mutation, associated drug, clinical tier, predicted effect, and the final WHO confidence grading.
+    \item \textbf{Coordinate Conversion Tool:} Users can input specific variants (e.g., \texttt{dnaA\_c.7G>A}) to calculate their absolute genomic coordinates, or input genomic positions to find the corresponding relative c. or p. notations.
+\end{enumerate}
+
+\subsection{Accessibility and Utility}
+By running entirely on local datasets, TBDashboard guarantees patient data privacy, as no genetic data is transmitted over the internet. This feature makes it highly suited for laboratory settings with strict data compliance policies. Furthermore, the application requires minimal setup and runs efficiently on standard laptop hardware, ensuring high accessibility for clinical settings in low-resource environments. 
+
+\section{Availability and Requirements}
+\begin{itemize}
+    \item \textbf{Project name:} TB Dashboard
+    \item \textbf{Project home page:} \url{https://github.com/falatfernando/tbdashboard}
+    \item \textbf{Operating system(s):} Platform independent (Linux, macOS, Windows)
+    \item \textbf{Programming language:} Python (version 3.8 or higher)
+    \item \textbf{License:} GNU General Public License v3.0
+\end{itemize}
+
+\end{document}
