@@ -17,11 +17,19 @@
 \maketitle
 
 \begin{abstract}
-\textbf{Background:} The rise of multi-drug resistant tuberculosis (MDR-TB) necessitates rapid and accurate genomic interpretation. The World Health Organization (WHO) compiled a comprehensive catalogue of resistance-associated mutations in \textit{Mycobacterium tuberculosis}, but the raw, text-based tables present a high barrier of entry for clinical and public health workers lacking bioinformatics expertise. \\
-\textbf{Objective:} We developed TBDashboard, an interactive, web-based graphical user interface designed to bridge this gap by enabling gene-centric visual exploration of the WHO drug resistance mutation catalogue without requiring programming or raw sequence analysis. \\
-\textbf{Software Features:} TBDashboard is built using Python Dash and integrates the JBrowse 2 genome browser via \texttt{dash-jbrowse}. The application offers: (1) quick lookup of tuberculosis genes by name or locus tag; (2) interactive, localized genomic track visualization; (3) WHO catalogue drug resistance profiling detailing confidence levels and effect sizes; (4) a coordinate calculator for translating between gene-relative (c. or p.) and absolute genomic positions; and (5) mutation-specific genomic coordinate details. \\
-\textbf{Significance:} By providing a localized, interactive, and dependency-light interface, TBDashboard facilitates the translation of complex genomic annotations into clinical understanding. It represents an essential open-source resource for public health epidemiology, diagnostic research, and clinical laboratories, especially in low-resource settings where bioinformatic pipelines are unavailable.
+\noindent\textbf{Background:} The rise of multi-drug resistant tuberculosis (MDR-TB) necessitates rapid and accurate genomic interpretation. The World Health Organization (WHO) compiled a comprehensive catalogue of resistance-associated mutations in \textit{Mycobacterium tuberculosis}, but the raw, text-based tables present a high barrier of entry for clinical and public health workers lacking bioinformatics expertise.
+
+\medskip
+\noindent\textbf{Objective:} We developed TBDashboard, an interactive, web-based graphical user interface designed to bridge this gap by enabling gene-centric visual exploration of the WHO drug resistance mutation catalogue without requiring programming or raw sequence analysis.
+
+\medskip
+\noindent\textbf{Software Features:} TBDashboard is built using Python Dash and integrates the JBrowse 2 genome browser via \texttt{dash-jbrowse}. The application offers: (1) quick lookup of tuberculosis genes by name or locus tag; (2) interactive, localized genomic track visualization; (3) WHO catalogue drug resistance profiling detailing confidence levels and effect sizes; (4) a coordinate calculator for translating between gene-relative (c. or p.) and absolute genomic positions; and (5) mutation-specific genomic coordinate details.
+
+\medskip
+\noindent\textbf{Significance:} By providing a localized, interactive, and dependency-light interface, TBDashboard facilitates the translation of complex genomic annotations into clinical understanding. It represents an essential open-source resource for public health epidemiology, diagnostic research, and clinical laboratories, especially in low-resource settings where bioinformatic pipelines are unavailable.
 \end{abstract}
+
+\clearpage
 
 \section{Background}
 Tuberculosis (TB), caused by the bacterium \textit{Mycobacterium tuberculosis}, remains a leading infectious cause of mortality globally. The management of TB is severely challenged by the ongoing emergence and spread of multi-drug resistant (MDR) and extensively drug-resistant (XDR) strains. While next-generation sequencing (NGS) technologies have made genomic profiling increasingly accessible, interpreting the clinical significance of identified mutations remains a bottleneck.
